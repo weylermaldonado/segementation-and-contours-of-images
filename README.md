@@ -1,4 +1,4 @@
-# A program what found countours and segment a image using OpenCV
+# A program what found countours and segment an image using OpenCV
 
 ## This program use Opencv implemented through C++
 
