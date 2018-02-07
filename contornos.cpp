@@ -80,7 +80,7 @@ void buscaYDibujaContornos(int, void* )
 ///guardamos coordenadas
 void guardaCoordenadas(vector<vector<Point> > contornos){
   ofstream file_output;
-  file_output.open("contornos_simple.mat");
+  file_output.open("contornos_simple.m");
   for(int i = 0;i < contornos.size(); i++){
      int tContorno = contornos[i].size();
     file_output << "Cont" << i << " = [";
@@ -96,7 +96,7 @@ void guardaCoordenadas(vector<vector<Point> > contornos){
 
     //eje y
     for(int k = 0; k < tContorno; k++){
-      file_output << contornos[i][k].y << endl;
+      file_output << contornos[i][k].y;
       if(k != tContorno - 1){
         file_output << ",";
       }
