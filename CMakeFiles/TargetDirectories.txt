@@ -1,0 +1,3 @@
+/home/weyler/Documentos/Vision/Contornos/CMakeFiles/edit_cache.dir
+/home/weyler/Documentos/Vision/Contornos/CMakeFiles/rebuild_cache.dir
+/home/weyler/Documentos/Vision/Contornos/CMakeFiles/contornos.dir
