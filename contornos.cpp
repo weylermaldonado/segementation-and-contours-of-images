@@ -238,7 +238,7 @@ void crearMatrizDoble(vector<vector<complex<double> > >  &matrizContornosComplej
 
 void guardarMatriz(vector<vector<double> > &matriz){
     ofstream archivoContornos;
-    archivoContornos.open("magnitudesFiltradas.m");
+    archivoContornos.open("filtros.m");
 	for(int i = 0; i < matriz.size(); i++){
 		for(int k = 0; k < matriz.at(i).size(); k++){
 			archivoContornos <<  matriz[i][k] << "," << " ";
