@@ -1,5 +1,0 @@
-cmake_minimum_required(VERSION 2.8)
-project( contornos )
-find_package( OpenCV REQUIRED )
-add_executable( contornos contornos.cpp )
-target_link_libraries( contornos ${OpenCV_LIBS} )
