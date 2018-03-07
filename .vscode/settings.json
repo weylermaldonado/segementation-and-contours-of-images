@@ -6,7 +6,9 @@
         "system_error": "cpp",
         "array": "cpp",
         "initializer_list": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "cmath": "cpp",
+        "cstdlib": "cpp"
     },
     "favorites.resources": []
 }

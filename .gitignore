@@ -33,10 +33,15 @@
 *.app
 
 #Folder
-.vscode
+../.vscode
+*.json
 
 #imagenes de prueba
 *.jpg
 *.png
+
+#Scripts de octave
+*.m
+
 
 # End of https://www.gitignore.io/api/c++

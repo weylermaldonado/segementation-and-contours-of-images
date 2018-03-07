@@ -91,7 +91,7 @@ vector<vector<Point> > convertirComplejosEnCoordenadas( vector<vector<complex<do
 
 void guardarCoordenadasContorno(vector<vector<Point> > contornos){
   ofstream archivoContornos;
-  archivoContornos.open("ContornosCartesianos.m");
+  archivoContornos.open("Contornos_Cartesianos.m");
   for(int i = 0;i < contornos.size(); i++){
      int sizeContorno = contornos[i].size();
     archivoContornos << "Cont" << i << "=[";

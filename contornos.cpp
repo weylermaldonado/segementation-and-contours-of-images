@@ -37,6 +37,16 @@ void convertirAcomplejos(vector<vector<complex<double> > > &matrizComplejosFrecu
 void crearMatrizDoble(vector<vector<complex<double> > >  &matrizContornosComplejos, vector<vector<double> >  &matrizDoble);
 void nuevaMatrizCompleja(vector<vector<complex<double> > > &matContornosComplex, vector<vector<complex<double> > > &matComplejosFrecuencia);
 void fftwForward(vector<vector<complex <double> > > &matContornosComplex, vector<vector<complex<double> > > &matComplejosFrecuencia);
+void filtrado(vector<vector<complex<double> > > &matComplexFrecuencia,  int numDescriptores);
+vector<vector<double> > getMagnitud(vector<vector<complex<double> > > &matrizComplexFrec);
+vector<vector<double> > getFase(vector<vector<complex<double> > > &matrizComplejosFrecuencia);
+void guardarMatriz(vector<vector<double> > &matriz);
+void toComplex(vector<vector<complex<double> > > &matrizComplejosFrecuencia, vector<vector<double> > &magnitudFrecuencia,vector<vector<double> > &faseFrecuencia);
+void fftwReverse(vector<vector<complex <double> > > &matrizContornosComplejos, vector<vector<complex<double> > > &matrizComplejosFrecuencia );
+void imprimirMatriz(vector<vector<complex<double> > > &matriz);
+vector<vector<Point> > transformarCoordenadasComplejas( vector<vector<complex<double> > > matContornosComplex);
+void guardarContornos(vector<vector<Point> > contornos);
+
 
 int main( int argc, char** argv )
 {
@@ -88,6 +98,7 @@ void buscaYDibujaContornos(int, void* )
   int descriptores = 10;
   matrizComplex = contornosComplejos(contours);
   descriptoresFourier(matrizComplex, descriptores);
+
 
   /// dibujamos contornos
   Mat contornos = Mat::zeros( canny_output.size(), CV_8UC3 );
@@ -159,8 +170,8 @@ void descriptoresFourier(vector <vector<complex<double> > > matContornosComplex,
   vector <vector<complex<double> > > matComplejosFrecuencia;
   nuevaMatrizCompleja(matContornosComplex, matComplejosFrecuencia);
   fftwForward(matContornosComplex, matComplejosFrecuencia);
-  //filtrarFrecuencias(matrizComplejosFrecuencia);
-  //calcularDFTInversa(matrizContornosComplejos, matrizComplejosFrecuencia);
+  filtrado(matComplejosFrecuencia, numDescriptores);
+  fftwReverse(matContornosComplex, matComplejosFrecuencia);
 }
 
 void nuevaMatrizCompleja(vector<vector<complex<double> > > &matContornosComplex, vector<vector<complex<double> > > &matComplejosFrecuencia){
@@ -178,4 +189,89 @@ void fftwForward(vector<vector<complex <double> > > &matContornosComplex, vector
   	 fftw_execute(plan);
   	 fftw_destroy_plan(plan);
   }
+}
+
+void filtrado(vector<vector<complex<double> > > &matComplexFrecuencia, int numDescriptores){
+  vector<vector<double> >  magnitud = getMagnitud(matComplexFrecuencia);
+  vector<vector<double> > fase = getFase(matComplexFrecuencia);
+  for(int i = 0; i < magnitud.size(); i++){
+  	for(int k = 0; k < magnitud[i].size(); k++){
+  	 if((k > numDescriptores)  && (k < fase[i].size() - numDescriptores)){	
+  			fase[i][k] = 0;
+  		}
+  	}
+  }
+  guardarMatriz(magnitud);
+  toComplex(matComplexFrecuencia,magnitud, fase);
+  magnitud.clear();
+  fase.clear();
+}
+
+vector<vector<double> > getMagnitud(vector<vector<complex<double> > > &matComplexFrecuencia){
+	vector<vector<double> >  frecuencia;
+	 crearMatrizDoble(matComplexFrecuencia ,frecuencia);
+	for(int i = 0; i < frecuencia.size(); i++){
+		for(int j = 0; j < frecuencia[i].size(); j++){
+			frecuencia[i][j] = abs(matComplexFrecuencia[i][j]);
+		}
+	}
+	return frecuencia;
+}
+
+vector<vector<double> > getFase(vector<vector<complex<double> > > &matComplexFrecuencia){
+	vector<vector<double> > frecuencia;
+    crearMatrizDoble(matComplexFrecuencia ,frecuencia);
+	for(int i = 0; i < frecuencia.size(); i++){
+		for(int j = 0; j < frecuencia[i].size(); j++){
+			frecuencia[i][j] = arg(matComplexFrecuencia[i][j]);
+		}
+	}
+	return frecuencia;
+}
+
+void crearMatrizDoble(vector<vector<complex<double> > >  &matrizContornosComplejos, vector<vector<double> >  &matrizDoble){
+	for(int i = 0; i < matrizContornosComplejos.size(); i++){
+	    vector<double>  vectorVacio(matrizContornosComplejos[i].size());
+		matrizDoble.push_back(vectorVacio);
+	}
+}
+
+void guardarMatriz(vector<vector<double> > &matriz){
+    ofstream archivoContornos;
+    archivoContornos.open("magnitudesFiltradas.m");
+	for(int i = 0; i < matriz.size(); i++){
+		for(int k = 0; k < matriz.at(i).size(); k++){
+			archivoContornos <<  matriz[i][k] << "," << " ";
+		}
+		archivoContornos << "\n";
+	}
+	archivoContornos.close();
+}
+
+void toComplex(vector<vector<complex<double> > > &matrizComplejosFrecuencia, vector<vector<double> > &magnitudFrecuencia,vector<vector<double> > &faseFrecuencia){
+  for(int i = 0; i < matrizComplejosFrecuencia.size(); i++){
+  	for(int k = 0; k < matrizComplejosFrecuencia[i].size(); k++){
+  		 	matrizComplejosFrecuencia[i][k] = polar(magnitudFrecuencia[i][k], faseFrecuencia[i][k]);
+  	}
+  }
+}
+
+void fftwReverse(vector<vector<complex <double> > > &matContornosComplex, vector<vector<complex<double> > > &matComplejosFrecuencia ){
+  fftw_plan plan;
+  for(int i = 0; i < matContornosComplex.size(); i++){
+  	 int sizeTransformadaSalida =  matContornosComplex[i].size();
+  	 plan = fftw_plan_dft_1d(sizeTransformadaSalida,reinterpret_cast<fftw_complex*>(&matComplejosFrecuencia[i].at(0)) ,reinterpret_cast<fftw_complex*>(&matContornosComplex[i].at(0)), FFTW_FORWARD, FFTW_ESTIMATE);
+  	 fftw_execute(plan);
+  	 fftw_destroy_plan(plan);
+  }
+  imprimirMatriz(matComplejosFrecuencia);
+}
+
+void imprimirMatriz(vector<vector<complex<double> > > &matriz){
+	for(int i = 0; i < matriz.size(); i++){
+		for(int k = 0; k < matriz.at(i).size(); k++){
+			cout << matriz[i][k]<< " ";
+		}
+		cout << "\n";
+	}
 }
