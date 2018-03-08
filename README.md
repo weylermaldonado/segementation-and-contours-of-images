@@ -5,12 +5,15 @@
 To compile this you need:
 
 * Opencv
-* A C++ compiler
+* fftw3
+
 
 To run:
-
 ```bash
-./contornos aimage.jpg
+make
+```
+```bash
+./contornos.o aimage.jpg
 ```
 **NOTE:**
 
